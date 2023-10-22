@@ -8,15 +8,17 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.List;
-import java.util.Optional;
+
 
 @AllArgsConstructor
 @RestController
 @RequestMapping("/clientes")
 public class ClienteController {
 
-    @Autowired
+
     private ClienteRepository clienteRepository;
     @GetMapping
     public List<Cliente> listar() {
@@ -27,18 +29,18 @@ public class ClienteController {
     @GetMapping("/{clienteId}")
     public ResponseEntity<Cliente> buscar(@PathVariable Long clienteId) {
         return clienteRepository.findById(clienteId)
-                .map(cliente -> ResponseEntity.ok(cliente))
+                .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Cliente adicionar(@RequestBody Cliente cliente) {
+    public Cliente adicionar(@Valid @NotNull @RequestBody Cliente cliente) {
+
         return clienteRepository.save(cliente);
     }
-
     @PutMapping("/{clienteId}")
     public ResponseEntity<Cliente> atualizar(@PathVariable Long clienteId,
-                                             @RequestBody Cliente cliente) {
+                                             @Valid  @RequestBody Cliente cliente) {
         if (!clienteRepository.existsById(clienteId)) {
             return ResponseEntity.notFound().build();
         }
@@ -48,7 +50,6 @@ public class ClienteController {
 
         return ResponseEntity.ok(cliente);
     }
-
     @DeleteMapping("/{clienteId}")
     public  ResponseEntity<Void> remover(@PathVariable long clienteId) {
         if (!clienteRepository.existsById(clienteId)) {
@@ -56,7 +57,6 @@ public class ClienteController {
         }
 
         clienteRepository.deleteById(clienteId);
-
         return ResponseEntity.noContent().build();
     }
 }
