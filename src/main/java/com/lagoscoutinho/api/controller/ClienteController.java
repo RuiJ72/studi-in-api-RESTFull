@@ -1,9 +1,9 @@
 package com.lagoscoutinho.api.controller;
 
 import com.lagoscoutinho.api.domain.model.Cliente;
+import com.lagoscoutinho.api.domain.model.service.CatalogoClienteService;
 import com.lagoscoutinho.api.domain.repository.ClienteRepository;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,8 +18,9 @@ import java.util.List;
 @RequestMapping("/clientes")
 public class ClienteController {
 
-
     private ClienteRepository clienteRepository;
+    private CatalogoClienteService catalogoClienteService;
+
     @GetMapping
     public List<Cliente> listar() {
 
@@ -36,7 +37,7 @@ public class ClienteController {
     @ResponseStatus(HttpStatus.CREATED)
     public Cliente adicionar(@Valid @NotNull @RequestBody Cliente cliente) {
 
-        return clienteRepository.save(cliente);
+        return catalogoClienteService.salvar(cliente);
     }
     @PutMapping("/{clienteId}")
     public ResponseEntity<Cliente> atualizar(@PathVariable Long clienteId,
@@ -46,7 +47,7 @@ public class ClienteController {
         }
 
         cliente.setId(clienteId);
-        cliente = clienteRepository.save(cliente);
+        cliente = catalogoClienteService.salvar(cliente);
 
         return ResponseEntity.ok(cliente);
     }
@@ -56,7 +57,8 @@ public class ClienteController {
             return ResponseEntity.notFound().build();
         }
 
-        clienteRepository.deleteById(clienteId);
+        catalogoClienteService.excluir(clienteId);
+
         return ResponseEntity.noContent().build();
     }
 }
