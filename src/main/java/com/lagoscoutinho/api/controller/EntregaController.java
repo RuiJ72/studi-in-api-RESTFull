@@ -3,7 +3,10 @@ package com.lagoscoutinho.api.controller;
 import com.lagoscoutinho.api.domain.model.Entrega;
 import com.lagoscoutinho.api.domain.model.service.SolicitacaoEntregaService;
 import com.lagoscoutinho.api.domain.repository.EntregaRepository;
+import com.lagoscoutinho.api.model.DestinatarioModel;
+import com.lagoscoutinho.api.model.EntregaModel;
 import lombok.AllArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +21,7 @@ public class EntregaController {
 
     private EntregaRepository entregaRepository;
     private SolicitacaoEntregaService solicitacaoEntregaService;
+    private ModelMapper modelMapper;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -32,9 +36,16 @@ public class EntregaController {
     }
 
     @GetMapping("/{entregaId}")
-    public ResponseEntity<Entrega> buscar(@PathVariable Long entregaId) {
+    public ResponseEntity<EntregaModel> buscar(@PathVariable Long entregaId) {
         return entregaRepository.findById(entregaId)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .map(entrega -> {
+                    EntregaModel entregaModel = modelMapper.map(entrega, EntregaModel.class);
+
+                    return ResponseEntity.ok(entregaModel);
+                }).orElse(ResponseEntity.notFound().build());
+
+
+
+
     }
 }
