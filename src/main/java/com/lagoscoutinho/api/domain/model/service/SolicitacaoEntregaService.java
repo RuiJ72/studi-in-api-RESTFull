@@ -3,14 +3,13 @@ package com.lagoscoutinho.api.domain.model.service;
 import com.lagoscoutinho.api.domain.model.Cliente;
 import com.lagoscoutinho.api.domain.model.Entrega;
 import com.lagoscoutinho.api.domain.model.StatusEntrega;
-import com.lagoscoutinho.api.domain.model.exception.NegocioException;
-import com.lagoscoutinho.api.domain.repository.ClienteRepository;
 import com.lagoscoutinho.api.domain.repository.EntregaRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 @AllArgsConstructor
 @Service
@@ -29,7 +28,7 @@ public class SolicitacaoEntregaService {
 
         entrega.setCliente(cliente);
         entrega.setStatus(StatusEntrega.PENDENTE);
-        entrega.setDataPedido(LocalDateTime.now());
+        entrega.setDataPedido(OffsetDateTime.now());
 
         return entregaRepository.save(entrega);
     }
