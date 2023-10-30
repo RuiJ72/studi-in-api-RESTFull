@@ -2,6 +2,7 @@ package com.lagoscoutinho.api.controller;
 
 import com.lagoscoutinho.api.assembler.EntregaAssembler;
 import com.lagoscoutinho.api.domain.model.Entrega;
+import com.lagoscoutinho.api.domain.model.service.FinalizacaoEntregaService;
 import com.lagoscoutinho.api.domain.model.service.SolicitacaoEntregaService;
 import com.lagoscoutinho.api.domain.repository.EntregaRepository;
 import com.lagoscoutinho.api.model.EntregaModel;
@@ -21,6 +22,7 @@ public class EntregaController {
 
     private EntregaRepository entregaRepository;
     private SolicitacaoEntregaService solicitacaoEntregaService;
+    private FinalizacaoEntregaService finalizacaoEntregaService;
     private EntregaAssembler entregaAssembler;
 
     @PostMapping
@@ -30,6 +32,12 @@ public class EntregaController {
 
         Entrega entregaSolicitada = solicitacaoEntregaService.solicitar(novaEntrega);
         return entregaAssembler.toModel(entregaSolicitada);
+    }
+
+    @PutMapping("/{entregaId}/finalizacao")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void finalizar(@PathVariable Long entregaId) {
+        finalizacaoEntregaService.finalizar(entregaId);
     }
 
     @GetMapping
@@ -44,4 +52,5 @@ public class EntregaController {
                 .orElse(ResponseEntity.notFound().build());
 
     }
+
 }
