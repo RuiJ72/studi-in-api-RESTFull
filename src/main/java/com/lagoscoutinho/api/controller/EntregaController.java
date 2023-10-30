@@ -1,12 +1,12 @@
 package com.lagoscoutinho.api.controller;
 
+import com.lagoscoutinho.api.assembler.EntregaAssembler;
 import com.lagoscoutinho.api.domain.model.Entrega;
 import com.lagoscoutinho.api.domain.model.service.SolicitacaoEntregaService;
 import com.lagoscoutinho.api.domain.repository.EntregaRepository;
-import com.lagoscoutinho.api.model.DestinatarioModel;
 import com.lagoscoutinho.api.model.EntregaModel;
+import com.lagoscoutinho.api.model.input.EntregaInput;
 import lombok.AllArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,31 +21,27 @@ public class EntregaController {
 
     private EntregaRepository entregaRepository;
     private SolicitacaoEntregaService solicitacaoEntregaService;
-    private ModelMapper modelMapper;
+    private EntregaAssembler entregaAssembler;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Entrega solicitar(@Valid @RequestBody Entrega entrega) {
+    public EntregaModel solicitar(@Valid @RequestBody EntregaInput entregaInput) {
+        Entrega novaEntrega = entregaAssembler.toEntity(entregaInput);
 
-        return solicitacaoEntregaService.solicitar(entrega);
+        Entrega entregaSolicitada = solicitacaoEntregaService.solicitar(novaEntrega);
+        return entregaAssembler.toModel(entregaSolicitada);
     }
 
     @GetMapping
-    public List<Entrega> listar() {
-        return entregaRepository.findAll();
+    public List<EntregaModel> listar() {
+        return entregaAssembler.toCollectionModel(entregaRepository.findAll());
     }
 
     @GetMapping("/{entregaId}")
     public ResponseEntity<EntregaModel> buscar(@PathVariable Long entregaId) {
         return entregaRepository.findById(entregaId)
-                .map(entrega -> {
-                    EntregaModel entregaModel = modelMapper.map(entrega, EntregaModel.class);
-
-                    return ResponseEntity.ok(entregaModel);
-                }).orElse(ResponseEntity.notFound().build());
-
-
-
+                .map(entrega -> ResponseEntity.ok(entregaAssembler.toModel(entrega)))
+                .orElse(ResponseEntity.notFound().build());
 
     }
 }
